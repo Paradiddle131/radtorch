@@ -65,8 +65,8 @@ class Image_Classification():
                 dr=False,
                 dr_dim=100,
                 fs=False,
-                fs_mode=None
-                fs_params=None
+                fs_mode=None,
+                fs_params=None,
 ############### BETA ENDS HERE #############################################################################################
                 **kwargs):
 
