@@ -64,7 +64,7 @@ from bokeh.transform import factor_cmap, cumsum
 from bokeh.palettes import viridis, Paired, inferno, brewer, d3
 from statistics import mode, mean
 from efficientnet_pytorch import EfficientNet
-
+from sklearn import decomposition
 # import streamlit as st
 
 
