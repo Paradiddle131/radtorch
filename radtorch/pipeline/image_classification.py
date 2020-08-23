@@ -176,8 +176,8 @@ class Image_Classification():
                 log('BETA: Running FEATURE SELECTION')
                 if self.feature_selection_mode=='variance':
                     self.feature_selector=feature_selection.VarianceThreshold(**self.feature_selection_params)
-                    self.selected_train_features=pd.DataFrame(feature_selector.fit_transform(self.train_feature_extractor.features))
-                    self.selected_features_names=(np.array(self.train_feature_extractor.feature_names)[selector.get_support().tolist()]).tolist()
+                    self.selected_train_features=pd.DataFrame(self.feature_selector.fit_transform(self.train_feature_extractor.features))
+                    self.selected_features_names=(np.array(self.train_feature_extractor.feature_names)[self.feature_selector.get_support().tolist()]).tolist()
                     self.selected_test_features=self.test_feature_extractor.features[self.selected_features_names]
                 self.extracted_feature_dictionary={
                                                     'train':{'features':self.selected_train_features, 'labels':self.train_feature_extractor.labels_idx, 'features_names': self.selected_features_names,},
