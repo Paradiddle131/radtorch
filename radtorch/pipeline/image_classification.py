@@ -61,8 +61,13 @@ class Image_Classification():
                 extra_transformations=None,
                 device='auto',
                 auto_save=False,
-                dim_reduction=False,
-                red_dim=100,
+############### BETA STARTS HERE ###########################################################################################
+                dr=False,
+                dr_dim=100,
+                fs=False,
+                fs_mode=None
+                fs_params=None
+############### BETA ENDS HERE #############################################################################################
                 **kwargs):
 
         self.data_directory=data_directory
@@ -103,8 +108,13 @@ class Image_Classification():
         self.extra_transformations=extra_transformations
         self.device=device
         self.name=name
-        self.dim_reduction=dim_reduction
-        self.red_dim=red_dim
+############### BETA STARTS HERE ###########################################################################################
+        self.dim_reduction=dr
+        self.red_dim=dr_dim
+        self.feature_selection=fs
+        self.feature_selection_mode=fs_mode
+        self.feature_selection_params=fs_params
+############### BETA ENDS HERE #############################################################################################
 
         if self.name==None:
             self.name = 'image_classification_'+datetime.now().strftime("%m%d%Y%H%M%S")+'.pipeline'
@@ -147,6 +157,8 @@ class Image_Classification():
                                                     'train':{'features':self.train_feature_extractor.features, 'labels':self.train_feature_extractor.labels_idx, 'features_names': self.train_feature_extractor.feature_names,},
                                                     'test':{'features':self.test_feature_extractor.features, 'labels':self.test_feature_extractor.labels_idx, 'features_names': self.test_feature_extractor.feature_names,}
                                                     }
+
+############# BETA STARTS HERE ###########################################################################################
             if self.dim_reduction:
                 log('BETA: Running PCA Dimensionality Reduction')
                 train_pca = decomposition.PCA(n_components=self.red_dim)
@@ -159,6 +171,20 @@ class Image_Classification():
                                                     'train':{'features':self.red_train_features, 'labels':self.train_feature_extractor.labels_idx, 'features_names': self.train_feature_extractor.feature_names,},
                                                     'test':{'features':self.red_test_features, 'labels':self.test_feature_extractor.labels_idx, 'features_names': self.test_feature_extractor.feature_names,}
                                                     }
+
+            if self.feature_selection:
+                log('BETA: Running FEATURE SELECTION')
+                if self.feature_selection_mode=='variance':
+                    self.feature_selector=feature_selection.VarianceThreshold(**self.feature_selection_params)
+                    self.selected_train_features=pd.DataFrame(feature_selector.fit_transform(self.train_feature_extractor.features))
+                    self.selected_features_names=(np.array(self.train_feature_extractor.feature_names)[selector.get_support().tolist()]).tolist()
+                    self.selected_test_features=self.test_feature_extractor.features[self.selected_features_names]
+                self.extracted_feature_dictionary={
+                                                    'train':{'features':self.selected_train_features, 'labels':self.train_feature_extractor.labels_idx, 'features_names': self.selected_features_names,},
+                                                    'test':{'features':self.selected_test_features, 'labels':self.test_feature_extractor.labels_idx, 'features_names': self.selected_features_names,}
+                                                    }
+############# BETA ENDS HERE ###########################################################################################
+
             log('Phase 2: Classifier Training.', gui=gui)
             log ('Running Classifier Training.', gui=gui)
             self.classifier=Classifier(**self.__dict__, )
