@@ -179,6 +179,15 @@ class Image_Classification():
                     self.selected_train_features=pd.DataFrame(self.feature_selector.fit_transform(self.train_feature_extractor.features))
                     self.selected_features_names=(np.array(self.train_feature_extractor.feature_names)[self.feature_selector.get_support().tolist()]).tolist()
                     self.selected_test_features=self.test_feature_extractor.features[self.selected_features_names]
+                    self.feature_selection_table=pd.DataFrame(zip(self.train_feature_extractor.feature_names, self.feature_selector.variances_ ), columns=['feature', 'variance']).sort_values(by=['variance'],ascending=False)
+
+                elif self.feature_selection_mode=='kbest':
+                    self.feature_selector=feature_selection.SelectKBest(feature_selection.chi2, **self.feature_selection_params)
+                    self.selected_train_features=pd.DataFrame(self.feature_selector.fit_transform(self.train_feature_extractor.features))
+                    self.selected_features_names=(np.array(self.train_feature_extractor.feature_names)[self.feature_selector.get_support().tolist()]).tolist()
+                    self.selected_test_features=self.test_feature_extractor.features[self.selected_features_names]
+                    self.feature_selection_table=pd.DataFrame(zip(self.train_feature_extractor.feature_names, self.feature_selector.scores_ , self.feature_selector.pvalues_ , ), columns=['feature', 'scores', 'pvalue']).sort_values(by=['pvalue'],ascending=False)
+
                 self.extracted_feature_dictionary={
                                                     'train':{'features':self.selected_train_features, 'labels':self.train_feature_extractor.labels_idx, 'features_names': self.selected_features_names,},
                                                     'test':{'features':self.selected_test_features, 'labels':self.test_feature_extractor.labels_idx, 'features_names': self.selected_features_names,}
