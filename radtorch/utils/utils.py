@@ -123,8 +123,36 @@ def datatable_from_filepath(*filelist,classes:list): #KareemElFatairy
     return df
 
 
-def create_data_table(directory, is_dicom, image_path_column, image_label_column):
+def file_name_to_label(file_path, label_list, missing='Unclassified'):
+    """
+    Description
+    -----------
+    Creates a class/label from for a file path if it contains certain class name(s)
 
+    Parameters
+    -----------
+    file_path (string, required): path of target file.
+    label_list (list, required): list of target classes/labels.
+    missing (string, optional): value to be given as label to file names which does not contain any of target classes. Default='Unclassified'
+
+    Parameters
+    -----------
+    Returns list with generated labels
+    """
+    file_name = ntpath.basename(file_path)
+    labels = [label for label in label_list if (label in file_name)]
+    if len(labels)==0:
+      return [missing]
+    else:
+      return labels
+
+
+def create_data_table(  directory,
+                        is_dicom,
+                        image_label_column='IMAGE_LABEL', image_path_column='IMAGE_PATH',
+                        label_source='parentfolder',
+                        num_labels=1,
+                        missing_class='Unclassified'):
     """
     Description
     -----------
@@ -133,22 +161,25 @@ def create_data_table(directory, is_dicom, image_path_column, image_label_column
     Parameters
     -----------
     directory (string, required): path of target data folder.
-    is_dicom (bolean, required): True if images are DICOM.
-    image_path_column (string, required): name of image path column in output data table.
-    image_label_column (string, required):name of image label column in output data table.
+    is_dicom (boolean, required): True if images are DICOM.
+    image_path_column (string, optional): name of image path column in output data table. Default= 'IMAGE_PATH'
+    image_label_column (string, optional):name of image label column in output data table. Default= 'IMAGE_LABEL'
+    label_source (string or list, requried): methodology of extracting labels. Default='parentfolder' extracts labels for each images using the name of the parent folder as the label.
+                                             If you submit a list of classes, then the function will look into file names and give labels according to labels found in file names.
+    num_labels (integer, optional): number of target labels. Default=1. Select more than one in case of multi-label problems.
+    missing_class (string, optional): value to be given as label to files missing classes. Default='Unclassified'
 
     Returns
     ----------
     Pandas dataframe with 2 columns:  image_path_column and image_label_column
-
     """
 
-    classes, class_to_idx=root_to_class(directory)
     all_files=list_of_files(directory)
-    if is_dicom:
-        dataset_files=[x for x in all_files  if x.endswith('.dcm')]
+    if is_dicom: dataset_files=[x for x in all_files if x.endswith('.dcm')]
     else: dataset_files=[x for x in all_files if x.endswith(IMG_EXTENSIONS)]
-    all_classes=[path_to_class(i) for i in dataset_files]
+    if label_source=='parentfolder': all_classes = [path_to_class(i) for i in dataset_files]
+    elif isinstance(label_source, list):
+      all_classes = [(file_name_to_label(i, label_source, missing=missing_class))[num_labels-1] for i in dataset_files]
     table=pd.DataFrame(list(zip(dataset_files, all_classes)), columns=[image_path_column, image_label_column])
     return table
 
