@@ -79,7 +79,7 @@ class DataLoader(Dataset):
 
 
         if self.is_path==False:
-            if self.data_directory=None:
+            if self.data_directory==None:
                 log ('No data_directory was provided. Please check.')
                 pass
             else:
