@@ -274,12 +274,12 @@ class DataProcessor():
 
     # Create Initial Master Table
         if isinstance(self.table, str):
-            if self.table!='': 
+            if self.table!='':
                 self.table=pd.read_csv(self.table)
         elif isinstance(self.table, pd.DataFrame):
             self.table=self.table
         else:self.table=create_data_table(directory=self.data_directory,
-                                            is_dicom=self.is_dicom
+                                            is_dicom=self.is_dicom,
                                             image_label_column=self.image_label_column,
                                             image_path_column=self.image_path_column,
                                             label_source=self.label_source,
