@@ -397,7 +397,7 @@ class DataProcessor():
             self.test_dataloader=torch.utils.data.DataLoader(dataset=self.test_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers, collate_fn=self.collate_function)
 
         else:
-            self.train_table, self.test_table=train_test_split(self.table, test_size=self.test_percent, random_state=100, shuffle=True)}
+            self.train_table, self.test_table=train_test_split(self.table, test_size=self.test_percent, random_state=100, shuffle=True)
             if self.balance_class:
                 self.train_table=balance_dataframe(dataframe=self.temp_table, method=self.balance_class_method, label_col=self.image_label_column)
             self.train_dataset=DataLoader(  data_directory=self.data_directory,
