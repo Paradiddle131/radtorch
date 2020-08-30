@@ -174,7 +174,7 @@ class DataLoader(Dataset):
         normalized_dataset.transformations.transforms.append(transforms.Normalize(mean=mean, std=std))
         return normalized_dataset
 
-class DataProcessor():
+class Data_Processor():
 
     """
     Description
