@@ -75,7 +75,8 @@ class DataLoader(Dataset):
             setattr((self, k, v))
 
 
-        if isinstance(self.table, string): self.table=pd.read_csv(self.table)
+        if isinstance(self.table, str):
+            self.table=pd.read_csv(self.table)
 
 
         if self.is_path==False:
@@ -433,13 +434,11 @@ class Data_Processor():
         """
         return self.master_dataset.class_to_idx
 
-
     def class_table(self):
         """
         Returns table of classes/class_idx in data.
         """
         return pd.DataFrame(list(zip(self.master_dataset.class_to_idx.keys(), self.master_dataset.class_to_idx.values())), columns=['Label', 'Label_idx'])
-
 
     def info(self):
         """
