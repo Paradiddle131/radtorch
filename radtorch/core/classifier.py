@@ -64,38 +64,34 @@ class Classifier(object):
         self.classifier_type=self.classifier.__class__.__name__
 
     def create_classifier(self, **kw):
-
-        """
-        Creates Classifier Object
-        """
-
         if self.type not in SUPPORTED_CLASSIFIER:
           log('Error! Classifier type not supported. Please check documentation for supported classifier types.')
           pass
         elif self.type=='lin_reg':
-          classifier=LinearRegression(n_jobs=-1, **kw)
+            classifier=LinearRegression(n_jobs=-1, **kw)
         elif self.type=='log_reg':
-          classifier=LogisticRegression(max_iter=10000,n_jobs=-1, **kw)
+            classifier=LogisticRegression(max_iter=10000,n_jobs=-1, **kw)
         elif self.type=='lasso':
-          classifier=Lasso(max_iter=10000,**kw)
+            classifier=Lasso(max_iter=10000,**kw)
         elif self.type=='elasticnet':
-          classifier=ElasticNet(max_iter=10000, **kw)
+            classifier=ElasticNet(max_iter=10000, **kw)
         elif self.type=='ridge':
-          classifier=RidgeClassifier(max_iter=10000, **kw)
+            classifier=RidgeClassifier(max_iter=10000, **kw)
         elif self.type=='sgd':
-          classifier=SGDClassifier(**kw)
+            classifier=SGDClassifier(**kw)
         elif self.type=='knn':
-          classifier=KNeighborsClassifier(n_jobs=-1,**kw)
+            classifier=KNeighborsClassifier(n_jobs=-1,**kw)
         elif self.type=='decision_trees':
-          classifier=tree.DecisionTreeClassifier(**kw)
+            classifier=tree.DecisionTreeClassifier(**kw)
         elif self.type=='random_forests':
-          classifier=RandomForestClassifier(**kw)
+            classifier=RandomForestClassifier(**kw)
         elif self.type=='gradient_boost':
-          classifier=GradientBoostingClassifier(**kw)
+            classifier=GradientBoostingClassifier(**kw)
         elif self.type=='adaboost':
-          classifier=AdaBoostClassifier(**kw)
+            classifier=AdaBoostClassifier(**kw)
         elif self.type=='xgboost':
-          classifier=XGBClassifier(**kw)
+            classifier=XGBClassifier(**kw)
+
         return classifier
 
     def info(self):
