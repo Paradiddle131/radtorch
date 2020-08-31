@@ -23,7 +23,7 @@ class Classifier(object):
 
     def __init__(self,
                 input_data_dict,
-                type='logistic_regression',
+                type='log_reg',
                 interaction_terms=False,
                 cv=True,
                 stratified=True,
