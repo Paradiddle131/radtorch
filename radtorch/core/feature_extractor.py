@@ -36,6 +36,9 @@ class Feature_Extractor():
         self.unfreeze=unfreeze
         self.device=device
 
+        if self.device=='auto':
+            self.device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         for k,v in kwargs.items():
             setattr(self,k,v)
         if self.model_arch not in supported_models:
