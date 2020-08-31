@@ -34,11 +34,11 @@ class Metrics():
           log('Error! Training was done without cross validation. Please use test_accuracy() instead.', gui=gui)
 
     def test_accuracy(self) :
-        return self.model.trained_model.score(self.test_features, self.test_labels)
+        return self.model.trained_model.score(self.model.test_features, self.model.test_labels)
         return acc
 
     def confusion_matrix(self,title='Confusion Matrix',cmap=None,normalize=False,figure_size=(8,6)):
-        pred_labels=self.model.trained_model.predict(self.test_features)
+        pred_labels=self.model.trained_model.predict(self.model.test_features)
         true_labels=self.model.test_labels
         cm = metrics.confusion_matrix(true_labels, pred_labels)
         show_confusion_matrix(cm=cm,
