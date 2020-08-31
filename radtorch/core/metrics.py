@@ -182,3 +182,6 @@ class Metrics():
 
     def roc(self, **kw):
         show_roc([self.model], **kw)
+
+    def misclassified():
+        return None

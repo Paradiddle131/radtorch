@@ -227,54 +227,54 @@ class Image_Classification():
             log ('Error! Pipeline could not be exported.')
             pass
 
-    def cam(self, target_image_path, target_layer, type='scorecam', figure_size=(10,5), cmap='jet', alpha=0.5):
-
-        if type =='cam':
-            wrapped_model = CAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
-        elif type == 'gradcam':
-            wrapped_model = GradCAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
-        elif type == 'gradcampp':
-            wrapped_model = GradCAMpp(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
-        elif type == 'smoothgradcampp':
-            wrapped_model = SmoothGradCAMpp(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
-        elif type == 'scorecam':
-            wrapped_model = ScoreCAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer,  device=self.device)
-
-        if self.is_dicom:
-            image=dicom_to_narray(target_image_path, self.mode, self.wl)
-            image=Image.fromarray(image)
-        else:
-            image=Image.open(target_image_path).convert('RGB')
-
-        prep_img=self.data_processor.transformations(image)
-        prep_img=prep_img.unsqueeze(0)
-        prep_img = prep_img.to(self.device)
-        cam, idx = wrapped_model(prep_img)
-        _, _, H, W = prep_img.shape
-        cam = F.interpolate(cam, size=(H, W), mode='bilinear', align_corners=True)
-
-        output_image=prep_img.squeeze(0).squeeze(0).cpu().numpy()
-        output_image=np.moveaxis(output_image, 0, -1)
-
-        plt.figure(figsize=figure_size)
-
-        plt.subplot(1, 3, 1)
-        plt.axis('off')
-        plt.gca().set_title('Target Image')
-        plt.imshow(output_image, cmap=plt.cm.gray)
-
-        plt.subplot(1, 3, 2)
-        plt.axis('off')
-        plt.gca().set_title(type.upper())
-        plt.imshow(cam.squeeze().cpu().numpy(), cmap=cmap, alpha=1)
-
-        plt.subplot(1, 3, 3)
-        plt.axis('off')
-        plt.gca().set_title('OVERLAY')
-        plt.imshow(output_image, cmap=plt.cm.gray)
-        plt.imshow(cam.squeeze().cpu().numpy(), cmap=cmap, alpha=alpha)
-
-        plt.show()
+    # def cam(self, target_image_path, target_layer, type='scorecam', figure_size=(10,5), cmap='jet', alpha=0.5):
+    #
+    #     if type =='cam':
+    #         wrapped_model = CAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
+    #     elif type == 'gradcam':
+    #         wrapped_model = GradCAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
+    #     elif type == 'gradcampp':
+    #         wrapped_model = GradCAMpp(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
+    #     elif type == 'smoothgradcampp':
+    #         wrapped_model = SmoothGradCAMpp(model=self.classifier.trained_model.to(self.device), target_layer=target_layer, device=self.device)
+    #     elif type == 'scorecam':
+    #         wrapped_model = ScoreCAM(model=self.classifier.trained_model.to(self.device), target_layer=target_layer,  device=self.device)
+    #
+    #     if self.is_dicom:
+    #         image=dicom_to_narray(target_image_path, self.mode, self.wl)
+    #         image=Image.fromarray(image)
+    #     else:
+    #         image=Image.open(target_image_path).convert('RGB')
+    #
+    #     prep_img=self.data_processor.transformations(image)
+    #     prep_img=prep_img.unsqueeze(0)
+    #     prep_img = prep_img.to(self.device)
+    #     cam, idx = wrapped_model(prep_img)
+    #     _, _, H, W = prep_img.shape
+    #     cam = F.interpolate(cam, size=(H, W), mode='bilinear', align_corners=True)
+    #
+    #     output_image=prep_img.squeeze(0).squeeze(0).cpu().numpy()
+    #     output_image=np.moveaxis(output_image, 0, -1)
+    #
+    #     plt.figure(figsize=figure_size)
+    #
+    #     plt.subplot(1, 3, 1)
+    #     plt.axis('off')
+    #     plt.gca().set_title('Target Image')
+    #     plt.imshow(output_image, cmap=plt.cm.gray)
+    #
+    #     plt.subplot(1, 3, 2)
+    #     plt.axis('off')
+    #     plt.gca().set_title(type.upper())
+    #     plt.imshow(cam.squeeze().cpu().numpy(), cmap=cmap, alpha=1)
+    #
+    #     plt.subplot(1, 3, 3)
+    #     plt.axis('off')
+    #     plt.gca().set_title('OVERLAY')
+    #     plt.imshow(output_image, cmap=plt.cm.gray)
+    #     plt.imshow(cam.squeeze().cpu().numpy(), cmap=cmap, alpha=alpha)
+    #
+    #     plt.show()
 
     def deploy(self, title="Image Classification", colab=False):
         if os.path.exists("/ui_framework.py"):

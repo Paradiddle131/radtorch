@@ -137,12 +137,6 @@ class NN_Classifier():
         self.optimizer=self.nn_optimizer(type=self.optimizer, model=self.model, learning_rate=self.learning_rate,  **self.optimizer_parameters)
 
     def info(self):
-
-        """
-        Returns table with all information about the nn_classifier object.
-
-        """
-
         info=pd.DataFrame.from_dict(({key:str(value) for key, value in self.__dict__.items()}).items())
         info.columns=['Property', 'Value']
         for i in ['train_dataset', 'valid_dataset','test_dataset']:
@@ -151,31 +145,6 @@ class NN_Classifier():
         return info
 
     def nn_optimizer(self, type, model, learning_rate, **kw):
-
-        """
-
-        Description
-        -----------
-        Creates an instance of pytorch optimizer
-
-
-        Parameters
-        ----------
-
-        - type (string, required): type of the optimizer. Please see settings for supported optimizers.
-
-        - model (pytorch model, required): model for which optimizer will be used for weight optimization.
-
-        - learning_rate (float, required): learning rate for training.
-
-        - **kw (dictionary, optional): other optional optimizer parameters as per pytorch documentation.
-
-        Returns
-        -------
-        pytorch nn.optimizer object
-
-        """
-
         if type not in supported_nn_optimizers:
             log('Error! Optimizer not supported yet. Please check radtorch.settings.supported_nn_optimizers')
             pass
@@ -197,24 +166,6 @@ class NN_Classifier():
         return optimizer
 
     def nn_loss_function(self, type, **kw):
-        """
-
-        Description
-        -----------
-        Creates an instance of pytorch loss function.
-
-        Parameters
-        ----------
-
-        - type (string, required): type of the loss function. Please see settings for supported loss functions.
-
-        - **kw (dictionary, optional): other optional loss function parameters as per pytorch documentation.
-
-        Returns
-        -------
-        pytorch nn.loss_function object
-
-        """
 
         if type not in supported_nn_loss_functions:
             log('Error! Loss functions not supported yet. Please check radtorch.settings.supported_nn_loss_functions')
@@ -243,16 +194,6 @@ class NN_Classifier():
         return loss_function
 
     def run(self, **kw):
-        """
-        Performs Model Training
-
-        Returns
-        --------
-        Tuple of
-            - trained_model: trained neural network model.
-            - train_metrics: pandas dataframe of training and validation metrics.
-        """
-
         model=self.model
         train_data_loader=self.train_dataloader
         valid_data_loader=self.valid_dataloader
@@ -264,7 +205,6 @@ class NN_Classifier():
         device=self.device
         if self.lr_scheduler!=None: lr_scheduler=self.lr_scheduler
         else: lr_scheduler=False
-
         set_random_seed(100)
         start_time=datetime.now()
         training_metrics=[]
@@ -342,46 +282,8 @@ class NN_Classifier():
         self.trained_model=model
         self.train_metrics=training_metrics
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
-        # return self.trained_model, self.train_metrics
-
-    def confusion_matrix(self, target_dataset=None, figure_size=(8,6), cmap=None):
-
-        """
-        Displays confusion matrix for trained nn_classifier on test dataset.
-
-        Parameters
-        ----------
-
-        - target_dataset (pytorch dataset, optional): this option can be used to test the trained model on an external test dataset. If set to None, the confusion matrix is generated using the test dataset initially specified in the data_processor. default=None.
-
-        - figure_size (tuple, optional): size of the figure as width, height. default=(8,6)
-
-        """
-
-        if target_dataset==None:target_dataset=self.test_dataset
-        target_classes=(self.data_processor.classes()).keys()
-
-        show_nn_confusion_matrix(model=self.trained_model, target_data_set=target_dataset, target_classes=target_classes, device=self.device, figure_size=figure_size, cmap=cmap)
-
-    def roc(self, **kw):
-        """
-        Displays ROC and AUC of trained model with test dataset
-
-        """
-        show_roc([self], **kw)
 
     def metrics(self, figure_size=(700,400)):
-
-        """
-        Displays graphical representation of train/validation loss /accuracy.
-
-        Parameters
-        ----------
-
-        - figure_size (tuple, optional): size of the figure as width, height. default=(700,400)
-
-        """
-
         show_metrics([self], figure_size=figure_size)
 
     def predict(self,  input_image_path, all_predictions=True, **kw):
@@ -428,6 +330,8 @@ class NN_Classifier():
             return prediction_table
         else:
             return final_prediction.item(), prediction_percentages[final_prediction.item()]
+
+
 
     def misclassified(self, num_of_images=4, figure_size=(5,5), table=False, **kw):
 
