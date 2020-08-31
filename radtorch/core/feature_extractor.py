@@ -22,32 +22,6 @@ from .data_processor import *
 
 class Feature_Extractor():
 
-    """
-
-    Description
-    -----------
-    Creates a feature extractor neural network using one of the famous CNN architectures and the data provided as dataloader from Data_Processor.
-
-    Parameters
-    ----------
-
-    - model_arch (string, required): CNN architecture to be utilized. To see list of supported architectures see settings.
-
-    - pre_trained (boolean, optional): Initialize with ImageNet pretrained weights or not. default=True.
-
-    - unfreeze (boolean, required): Unfreeze all layers of network for future retraining. default=False.
-
-    - dataloader (pytorch dataloader object, required): the dataloader that will be used to supply data for feature extraction.
-
-    - device (string, optional): device to be used for training. Options{'auto': automatic detection of device type, 'cpu': cpu, 'cuda': gpu}. default='auto'.
-
-    Retruns
-    ---------
-    Pandas dataframe with extracted features.
-
-    """
-
-
     def __init__(
                 self,
                 model_arch,
@@ -104,21 +78,9 @@ class Feature_Extractor():
                 param.requires_grad = False
 
     def num_features(self):
-        """
-        Returns the number of features to be extracted.
-        """
         return model_dict[self.model_arch]['output_features']
 
     def run(self, verbose=False, gui=False):
-        """
-        Runs the feature exraction process
-
-        Returns
-        --------
-        tuple of feature_table (dataframe which contains all features, labels and image file path), features (dataframe which contains features only), feature_names(list of feature names)
-
-        """
-
         if 'balance_class' in self.__dict__.keys() and 'normalize' in self.__dict__.keys():
             log('Running Feature Extraction using '+str(self.model_arch)+' architecture with balance_class = '+str(self.balance_class)+' and normalize = '+str(self.normalize)+".", gui=gui)
         else:
@@ -133,9 +95,6 @@ class Feature_Extractor():
             with torch.no_grad():
                 self.model.eval()
                 imgs=imgs.to(self.device)
-                # if 'efficientnet' in self.model_arch:
-                #     output = (self.model.extract_features(imgs)).tolist()
-                # else:
                 output=(self.model(imgs)).tolist()
                 self.features=self.features+(output)
         self.feature_names=['f_'+str(i) for i in range(0,self.num_features())]
@@ -150,15 +109,6 @@ class Feature_Extractor():
             print (self.feature_table)
 
     def export_features(self,csv_path):
-
-        """
-        Exports extracted features into csv file.
-
-        Parameters
-        ----------
-        csv_path (string, required): path to csv output.
-
-        """
         try:
             self.feature_table.to_csv(csv_path, index=False)
             log('Features exported to CSV successfully.')
@@ -167,33 +117,9 @@ class Feature_Extractor():
             pass
 
     def plot_extracted_features(self, num_features=100, num_images=100,image_path_column='IMAGE_PATH', image_label_column='IMAGE_LABEL'):
-        """
-        Plots Extracted Features in Heatmap
-
-        Parameters
-        -----------
-
-        - num_features (integer, optional): number of features to display. default=100
-
-        - num_images (integer, optional): number of images to display features for. default=100
-
-        - image_path_column (string, required): name of column that has image names/path. default='IMAGE_PATH'
-
-        - image_label_column (string, required): name of column that has image labels. default='IMAGE_LABEL'
-
-        """
-
         return plot_features(feature_table=self.feature_table, feature_names=self.feature_names, num_features=num_features, num_images=num_images,image_path_col=image_path_column, image_label_col=image_label_column)
 
     def export(self, output_path):
-        """
-        Exports the Feature Extractor object for future use.
-
-        Parameters
-        ----------
-        output_path (string, required): output file path.
-
-        """
         try:
             outfile=open(output_path,'wb')
             pickle.dump(self,outfile)

@@ -108,7 +108,7 @@ class Classifier(object):
         info.columns=['Property', 'Value']
         return info
 
-    def train(self):
+    def run(self):
 
         """
         Runs Image Classifier Training.
@@ -145,6 +145,9 @@ class Classifier(object):
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
         self.trained_model = self.classifier
         return self.trained_model, self.train_metrics
+
+
+
     #
     # def average_cv_accuracy(self):
     #
