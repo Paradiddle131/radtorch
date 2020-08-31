@@ -140,7 +140,7 @@ class Classifier(object):
         log(str(self.classifier_type)+ ' overall training accuracy: %0.2f (+/- %0.2f)' % ( self.scores .mean(),  self.scores .std() * 2))
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
         self.trained_model = self.classifier
-        return self.trained_model, self.train_metrics
+        # return self.trained_model, self.train_metrics
 
 
 
