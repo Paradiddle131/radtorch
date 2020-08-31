@@ -29,7 +29,7 @@ class Classifier(object):
                 stratified=True,
                 num_splits=5,
                 parameters={},
-                random_state=100
+                random_state=100,
                 **kwargs):
 
         for k, v in kwargs.items():
