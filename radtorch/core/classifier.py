@@ -143,64 +143,64 @@ class Classifier(object):
         log(str(self.classifier_type)+ ' model training finished successfully.')
         log(str(self.classifier_type)+ ' overall training accuracy: %0.2f (+/- %0.2f)' % ( self.scores .mean(),  self.scores .std() * 2))
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
-        return self.classifier, self.train_metrics
-
-    def average_cv_accuracy(self):
-
-        """
-        Returns average cross validation accuracy.
-        """
-
-        if self.cv:
-          return self.scores.mean()
-        else:
-          log('Error! Training was done without cross validation. Please use test_accuracy() instead.', gui=gui)
-
-    def test_accuracy(self) :
-
-        """
-        Returns accuracy of trained classifier on test dataset.
-        """
-
-        acc= self.classifier.score(self.test_features, self.test_labels)
-        return acc
-
-
-
-
-    def confusion_matrix(self,title='Confusion Matrix',cmap=None,normalize=False,figure_size=(8,6)):
-
-        """
-        Displays confusion matrix using trained classifier and test dataset.
-
-        Parameters
-        ----------
-        - title (string, optional): name to be displayed over confusion matrix.
-        - cmap (string, optional): colormap of the displayed confusion matrix. This follows matplot color palletes. default=None.
-        - normalize (boolean, optional): normalize values. default=False.
-        - figure_size (tuple, optional): size of the figure as width, height. default=(8,6)
-
-        """
-
-        pred_labels=self.classifier.predict(self.test_features)
-        true_labels=self.test_labels
-        cm = metrics.confusion_matrix(true_labels, pred_labels)
-        show_confusion_matrix(cm=cm,
-                              target_names=self.classes,
-                              title=title,
-                              cmap=cmap,
-                              normalize=normalize,
-                              figure_size=figure_size
-                              )
-
-    def roc(self, **kw):
-
-        """
-        Display ROC and AUC of trained classifier and test dataset.
-
-        """
-
-        show_roc([self], **kw)
+        self.trained_model = self.classifier
+        return self.trained_model, self.train_metrics
+    #
+    # def average_cv_accuracy(self):
+    #
+    #     """
+    #     Returns average cross validation accuracy.
+    #     """
+    #
+    #     if self.cv:
+    #       return self.scores.mean()
+    #     else:
+    #       log('Error! Training was done without cross validation. Please use test_accuracy() instead.', gui=gui)
+    #
+    # def test_accuracy(self) :
+    #
+    #     """
+    #     Returns accuracy of trained classifier on test dataset.
+    #     """
+    #
+    #     acc= self.classifier.score(self.test_features, self.test_labels)
+    #     return acc
+    #
+    #
+    #
+    # def confusion_matrix(self,title='Confusion Matrix',cmap=None,normalize=False,figure_size=(8,6)):
+    #
+    #     """
+    #     Displays confusion matrix using trained classifier and test dataset.
+    #
+    #     Parameters
+    #     ----------
+    #     - title (string, optional): name to be displayed over confusion matrix.
+    #     - cmap (string, optional): colormap of the displayed confusion matrix. This follows matplot color palletes. default=None.
+    #     - normalize (boolean, optional): normalize values. default=False.
+    #     - figure_size (tuple, optional): size of the figure as width, height. default=(8,6)
+    #
+    #     """
+    #
+    #     pred_labels=self.classifier.predict(self.test_features)
+    #     true_labels=self.test_labels
+    #     cm = metrics.confusion_matrix(true_labels, pred_labels)
+    #     show_confusion_matrix(cm=cm,
+    #                           target_names=self.classes,
+    #                           title=title,
+    #                           cmap=cmap,
+    #                           normalize=normalize,
+    #                           figure_size=figure_size
+    #                           )
+    #
+    # def roc(self, **kw):
+    #
+    #     """
+    #     Display ROC and AUC of trained classifier and test dataset.
+    #
+    #     """
+    #
+    #     show_roc([self], **kw)
 
     def predict(self, input_image_path, all_predictions=False, **kw):
 
