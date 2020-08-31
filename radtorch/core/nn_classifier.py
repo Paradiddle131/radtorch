@@ -342,7 +342,7 @@ class NN_Classifier():
         self.trained_model=model
         self.train_metrics=training_metrics
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
-        return self.trained_model, self.train_metrics
+        # return self.trained_model, self.train_metrics
 
     def confusion_matrix(self, target_dataset=None, figure_size=(8,6), cmap=None):
 

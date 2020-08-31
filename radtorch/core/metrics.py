@@ -118,6 +118,7 @@ class Metrics():
     def __init__(self, model, device='auto',
                 **kwargs):
         self.model = model
+        self.device=device
         for k, v in kwargs.items():
             setattr(self, k, v)
 
