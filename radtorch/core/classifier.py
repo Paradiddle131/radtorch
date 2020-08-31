@@ -10,12 +10,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see https://www.gnu.org/licenses/
 
-# Documentation update: 5/11/2020
+# Update: 8/30/2020
 
 from ..settings import *
 from ..utils import *
-
-from .dataset import *
 from .data_processor import *
 from .feature_extractor import *
 
@@ -23,101 +21,35 @@ from .feature_extractor import *
 
 class Classifier(object):
 
-    """
-
-    Description
-    -----------
-    Image Classification Class. Performs Binary/Multiclass classification using features extracted via Feature Extractor or Supplied by user.
-
-
-    Parameters
-    -----------
-
-    - extracted_feature_dictionary (dictionary, required): Dictionary of features/labels datasets to be used for classification. This follows the following format :
-    {
-        'train':
-                {'features':dataframe, 'feature_names':list, 'labels': list}},
-        'test':
-                {'features':dataframe, 'feature_names':list, 'labels': list}},
-    }
-
-    - feature_table (string, optional): path to csv table with user selected image paths, labels and features. default=None.
-
-    - image_label_column (string, required if using feature_table): name of the column with images labels.default=None.
-
-    - image_path_column (string, requried if using feature_table): name of column with images paths.default=None.
-
-    - test_percent (float, required if using feature_table): percentage of data for testing.default=None.
-
-    - type (string, required): type of classifier. For complete list refer to settings. default='logistic_regression'.
-
-    - interaction_terms (boolean, optional): create interaction terms between different features and add them as new features to feature table. default=False.
-
-    - cv (boolean, required): True for cross validation. default=True.
-
-    - stratified (boolean, required): True for stratified cross validation. default=True.
-
-    - num_splits (integer, required): Number of K-fold cross validation splits. default=5.
-
-    - parameters (dictionary, optional): optional parameters passed to the classifier. Please refer to sci-kit learn documentaion.
-
-    """
-
     def __init__(self,
-                extracted_feature_dictionary=None,
-                feature_table=None,
-                image_label_column=None,
-                image_path_column=None,
-                test_percent=None,
+                input_data_dict,
                 type='logistic_regression',
                 interaction_terms=False,
                 cv=True,
                 stratified=True,
                 num_splits=5,
                 parameters={},
+                random_state=100
                 **kwargs):
 
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.extracted_feature_dictionary=extracted_feature_dictionary
-        self.feature_table=feature_table
-        self.image_label_column=image_label_column
-        self.image_path_column=image_path_column
-        self.test_percent=test_percent
+        self.input_data_dict=input_data_dict
         self.type=type
         self.interaction_terms=interaction_terms
         self.cv=cv
         self.stratified=stratified
         self.num_splits=num_splits
         self.parameters=parameters
+        self.random_state=random_state
 
-
-        # Load extracted feature dictionary
-        if self.extracted_feature_dictionary != None:
-            self.feature_names=self.extracted_feature_dictionary['train']['features_names']
-            self.train_features=self.extracted_feature_dictionary['train']['features']
-            self.train_labels=np.array(self.extracted_feature_dictionary['train']['labels'])
-            self.test_features=self.extracted_feature_dictionary['test']['features']
-            self.test_labels=np.array(self.extracted_feature_dictionary['test']['labels'])
-
-
-        # Or Load user specified features
-        else:
-            if self.feature_table is not None:
-                if isinstance(self.feature_table, str):
-                    try:
-                        self.feature_table=pd.read_csv(self.feature_table)
-                    except:
-                        log('Loading feature table failed. Please check the location of the feature table.')
-                        pass
-                elif isinstance(self.feature_table, pd.DataFrame):
-                    self.feature_table=self.feature_table
-
-            self.feature_names=[x for x in self.feature_table.columns if x not in [self.image_label_column,self.image_path_column]]
-            self.labels=self.feature_table[self.image_label_column]
-            self.features=self.feature_table[self.feature_names]
-            self.train_features,  self.test_features, self.train_labels, self.test_labels=train_test_split(self.features, self.labels, test_size=self.test_percent, random_state=100)
+        # Load input feature table
+        self.feature_names=self.input_data_dict['train']['features_names']
+        self.train_features=self.input_data_dict['train']['features']
+        self.train_labels=np.array(self.input_data_dict['train']['labels'])
+        self.test_features=self.input_data_dict['test']['features']
+        self.test_labels=np.array(self.input_data_dict['test']['labels'])
 
         # Interaction Terms
         if self.interaction_terms:
@@ -138,12 +70,16 @@ class Classifier(object):
         """
 
         if self.type not in SUPPORTED_CLASSIFIER:
-          log('Error! Classifier type not supported. Please check again.')
+          log('Error! Classifier type not supported. Please check documentation for supported classifier types.')
           pass
-        elif self.type=='linear_regression':
+        elif self.type=='lin_reg':
           classifier=LinearRegression(n_jobs=-1, **kw)
-        elif self.type=='logistic_regression':
+        elif self.type=='log_reg':
           classifier=LogisticRegression(max_iter=10000,n_jobs=-1, **kw)
+        elif self.type=='lasso':
+          classifier=Lasso(max_iter=10000,**kw)
+        elif self.type=='elasticnet':
+          classifier=ElasticNet(max_iter=10000, **kw)
         elif self.type=='ridge':
           classifier=RidgeClassifier(max_iter=10000, **kw)
         elif self.type=='sgd':
@@ -172,41 +108,40 @@ class Classifier(object):
         info.columns=['Property', 'Value']
         return info
 
-    def run(self, gui=False):
+    def train(self):
 
         """
-        Runs Image Classifier.
+        Runs Image Classifier Training.
         """
 
         self.scores=[]
         self.train_metrics=[]
+
         if self.cv:
           if self.stratified:
-            kf=StratifiedKFold(n_splits=self.num_splits, shuffle=True, random_state=100)
-            log('Training '+str(self.classifier_type)+ ' with '+str(self.num_splits)+' split stratified cross validation.', gui=gui)
+            kf=StratifiedKFold(n_splits=self.num_splits, shuffle=True, random_state=self.random_state)
+            log('Training '+str(self.classifier_type)+ ' with '+str(self.num_splits)+' split stratified cross validation.')
           else:
-            kf=KFold(n_splits=self.num_splits, shuffle=True, random_state=100)
-            log('Training '+str(self.classifier_type)+ ' classifier with '+str(self.num_splits)+' splits cross validation.', gui=gui)
+            kf=KFold(n_splits=self.num_splits, shuffle=True, random_state=self.random_state)
+            log('Training '+str(self.classifier_type)+ ' classifier with '+str(self.num_splits)+' splits cross validation.')
           split_id=0
-          if gui: my_bar = st.progress(0)
           for train, test in tqdm(kf.split(self.train_features, self.train_labels), total=self.num_splits):
             self.classifier.fit(self.train_features.iloc[train], self.train_labels[train])
             split_score=self.classifier.score(self.train_features.iloc[test], self.train_labels[test])
             self.scores.append(split_score)
-            log('Split '+str(split_id)+' Accuracy = ' +str(split_score), gui=gui)
+            log('Split '+str(split_id)+' Accuracy = ' +str(split_score))
             self.train_metrics.append([[0],[0],[split_score],[0]])
             split_id+=1
-            if gui: my_bar.progress(int(split_id*100/self.num_splits))
         else:
-          log('Training '+str(self.type)+' classifier without cross validation.', gui=gui)
+          log('Training '+str(self.type)+' classifier without cross validation.')
           self.classifier.fit(self.train_features, self.train_labels)
           score=self.classifier.score(self.test_features, self.test_labels)
           self.scores.append(score)
           self.train_metrics.append([[0],[0],[score],[0]])
         self.scores = np.asarray(self.scores )
         self.classes=self.classifier.classes_.tolist()
-        log(str(self.classifier_type)+ ' model training finished successfully.', gui=gui)
-        log(str(self.classifier_type)+ ' overall training accuracy: %0.2f (+/- %0.2f)' % ( self.scores .mean(),  self.scores .std() * 2), gui=gui)
+        log(str(self.classifier_type)+ ' model training finished successfully.')
+        log(str(self.classifier_type)+ ' overall training accuracy: %0.2f (+/- %0.2f)' % ( self.scores .mean(),  self.scores .std() * 2))
         self.train_metrics = pd.DataFrame(data=self.train_metrics, columns = ['Train_Loss', 'Valid_Loss', 'Train_Accuracy', 'Valid_Accuracy'])
         return self.classifier, self.train_metrics
 
@@ -230,6 +165,9 @@ class Classifier(object):
         acc= self.classifier.score(self.test_features, self.test_labels)
         return acc
 
+
+
+
     def confusion_matrix(self,title='Confusion Matrix',cmap=None,normalize=False,figure_size=(8,6)):
 
         """
@@ -237,13 +175,9 @@ class Classifier(object):
 
         Parameters
         ----------
-
         - title (string, optional): name to be displayed over confusion matrix.
-
         - cmap (string, optional): colormap of the displayed confusion matrix. This follows matplot color palletes. default=None.
-
         - normalize (boolean, optional): normalize values. default=False.
-
         - figure_size (tuple, optional): size of the figure as width, height. default=(8,6)
 
         """

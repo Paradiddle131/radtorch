@@ -19,32 +19,6 @@ from ..utils import *
 
 class DataLoader(Dataset):
 
-    """
-
-    Description
-    -----------
-    Core class for dataset. This is an extension of Pytorch dataset class with modifications.
-
-    Parameters
-    ------------
-    - data_directory (string, required): path to target data directory/folder.
-    - is_dicom (bollean, optional): True if images are DICOM. default=False.
-    - table (string or pandas dataframe, optional): path to label table csv or name of pandas data table. default=None.
-    - image_path_column (string, optional): name of column that has image path/image file name. default='IMAGE_PATH'.
-    - image_label_column (string, optional): name of column that has image label. default='IMAGE_LABEL'.
-    - is_path (boolean, optional): True if file_path column in table is file path. If False, this assumes that the column contains file names only and will append the data_directory to all files. default=True.
-    - mode (string, optional): mode of handling pixel values from DICOM to numpy array. Option={'RAW': raw pixel values, 'HU': converts pixel values to HU using slope and intercept, 'WIN':Applies a certain window/level to HU converted DICOM image, 'MWIN': converts DICOM image to 3 channel HU numpy array with each channel adjusted to certain window/level. default='RAW'.
-    - wl (tuple or list of tuples, optional): value of Window/Levelto be used. If mode is set to 'WIN' then wl takes the format (level, window). If mode is set to 'MWIN' then wl takes the format [(level1, window1), (level2, window2), (level3, window3)]. default=None.
-    - sampling (float, optional): fraction of the whole dataset to be used. default=1.0.
-    - transformations (list, optional): list of pytorch transformations to be applied to all datasets. By default, the images are resized, channels added up to 3 and greyscaled. default='default'.
-
-    Returns
-    -----------
-    RADTorch dataset object.
-
-
-    """
-
     def __init__(
                 self,
                 table,
@@ -176,40 +150,6 @@ class DataLoader(Dataset):
         return normalized_dataset
 
 class Data_Processor():
-
-    """
-    Description
-    ------------
-    Class Data Processor. The core class for data preparation before feature extraction and classification. This class performs dataset creation, data splitting, sampling, balancing, normalization and transformations.
-
-
-    Parameters
-    ------------
-
-    - data_directory (string, required): path to target data directory/folder.
-    - is_dicom (bollean, optional): True if images are DICOM. default=False.
-    - table (string or pandas dataframe, optional): path to label table csv or name of pandas data table. default=None.
-    - image_path_column (string, optional): name of column that has image path/image file name. default='IMAGE_PATH'.
-    - image_label_column (string, optional): name of column that has image label. default='IMAGE_LABEL'.
-    - is_path (boolean, optional): True if file_path column in table is file path. If False, this assumes that the column contains file names only and will append the data_directory to all files. default=False.
-    - mode (string, optional): mode of handling pixel values from DICOM to numpy array. Option={'RAW': raw pixel values, 'HU': converts pixel values to HU using slope and intercept, 'WIN':Applies a certain window/level to HU converted DICOM image, 'MWIN': converts DICOM image to 3 channel HU numpy array with each channel adjusted to certain window/level. default='RAW'.
-    - wl (tuple or list of tuples, optional): value of Window/Levelto be used. If mode is set to 'WIN' then wl takes the format (level, window). If mode is set to 'MWIN' then wl takes the format [(level1, window1), (level2, window2), (level3, window3)]. default=None.
-    - balance_class (bollean, optional): True to perform oversampling in the train dataset to solve class imbalance. default=False.
-    - balance_class_method (string, optional): methodology used to balance classes. Options={'upsample', 'downsample'}. default='upsample'.
-    - normalize (bolean/False or Tuple, optional): Normalizes all datasets by a specified mean and standard deviation. Since most of the used CNN architectures assumes 3 channel input, this follows the following format ((mean, mean, mean), (std, std, std)). default=((0,0,0), (1,1,1)).
-    - batch_size (integer, optional): Batch size for dataloader. defult=16.
-    - num_workers (integer, optional): Number of CPU workers for dataloader. default=0.
-    - sampling (float, optional): fraction of the whole dataset to be used. default=1.0.
-    - test_percent (float, optional): percentage of data for testing.default=0.2.
-    - valid_percent (float, optional): percentage of data for validation (ONLY with NN_Classifier) .default=0.2.
-    - custom_resize (integer, optional): By default, the data processor resizes the image in dataset into the size expected bu the different CNN architectures. To override this and use a custom resize, set this to desired value. default=False.
-    - model_arch (string, required): CNN model architecture that this data will be used for. Used to resize images as detailed above. default='alexnet' .
-    - type (string, required): type of classifier that will be used. please refer to classifier object type. default='nn_classifier'.
-    - device (string, optional): device to be used for training. Options{'auto': automatic detection of device type, 'cpu': cpu, 'cuda': gpu}. default='auto'.
-    - transformations (list, optional): list of pytorch transformations to be applied to all datasets. By default, the images are resized, channels added up to 3 and greyscaled. default='default'.
-    - extra_transformations (list, optional): list of pytorch transformations to be extra added to train dataset specifically. default=None.
-
-    """
 
     def __init__(
                 self,
