@@ -22,45 +22,6 @@ from .feature_extractor import *
 
 class NN_Classifier():
 
-    """
-    Description
-    ------------
-    Neural Network Classifier. This serves as extension of pytorch neural network modules e.g. VGG16, for fine tuning or transfer learning.
-
-
-    Parameters
-    ----------
-
-    - data_processor (radtorch.core.data_processor, required): data processor object from radtorch.core.Data_Processor.
-
-    - feature_extractor (radtorch.core.feature_extractor, required): feature_extractor object from radtorch.core.Feature_Extractor.
-
-    - unfreeze (boolean, optional): True to unfreeze the weights of all layers in the neural network model for model finetuning. False to just use unfreezed final layers for transfer learning. default=False.
-
-    - learning_rate (float, required): Learning rate. default=0.0001.
-
-    - epochs (integer, required): training epochs. default=10.
-
-    - optimizer (string, required): neural network optimizer type. Please see radtorch.settings for list of approved optimizers. default='Adam'.
-
-    - optimizer_parameters (dictionary, optional): optional extra parameters for optimizer as per pytorch documentation.
-
-    - loss_function (string, required): neural network loss function. Please see radtorch.settings for list of approved loss functions. default='CrossEntropyLoss'.
-
-    - loss_function_parameters (dictionary, optional): optional extra parameters for loss function as per pytorch documentation.
-
-    - lr_scheduler (string, optional): learning rate scheduler - upcoming soon.
-
-    - batch_size (integer, required): batch size. default=16
-
-    - custom_nn_classifier (pytorch model, optional): Option to use a custom made neural network classifier that will be added after feature extracted layers. default=None.
-
-    - device (string, optional): device to be used for training. Options{'auto': automatic detection of device type, 'cpu': cpu, 'cuda': gpu}. default='auto'.
-
-    -
-
-    """
-
     def __init__(self,
                 feature_extractor,
                 data_processor,
